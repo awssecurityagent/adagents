@@ -1493,14 +1493,18 @@ def retrieve_knowledge_base_results_tool(
         include_metadata=True,
     )
 
+    if not kb_result:
+        logger.warning(f"⚠️ TOOL: KB query returned None for {agent_name}")
+        return ""
+
     citations = kb_result.get("citations", [])
     for citation in citations:
         generatedResponse = (
             citation.get("generatedResponsePart", {})
             .get("textResponsePart", {})
-            .get("text")
+            .get("text", "")
         )
-        if "I am unable to" not in generatedResponse:
+        if generatedResponse and "I am unable to" not in generatedResponse:
             result_string += f"<source>{generatedResponse}</source>"
     result_string += "</sources>"
     # generated_text = kb_result.get('output', {}).get('text', '')

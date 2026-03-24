@@ -311,10 +311,12 @@ export class SessionManagerService {
 
   private generateSessionId(userId?: string | null, customerName?: string | null, tabId?: string): string {
     const baseId = v4();
-    const sanitizedUserId = userId ? userId.replace(/[^a-zA-Z0-9]/g, '-') : 'anonymous';
-    const sanitizedCustomerName = customerName ? customerName.replace(/[^a-zA-Z0-9]/g, '-') : `demo-${Date.now()}`;
-    const tabPart = tabId ? `-${tabId}` : '';
-    return `${sanitizedUserId}-${sanitizedCustomerName}${tabPart}-${baseId}`;
+    const sanitizedUserId = userId ? userId.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 16) : 'anon';
+    const sanitizedCustomerName = customerName ? customerName.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 16) : 'demo';
+    const tabPart = tabId ? `-${tabId.substring(0, 8)}` : '';
+    // AgentCore Memory sessionId has a 100 char max constraint
+    const sessionId = `${sanitizedUserId}-${sanitizedCustomerName}${tabPart}-${baseId}`;
+    return sessionId.substring(0, 100);
   }
 
   private generateSessionTitle(date: Date): string {
